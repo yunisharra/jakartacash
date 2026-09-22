@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html ⚡ lang="id">
+
+<head>
+    <meta charset="utf-8">
+    <title>JakartaCash Legendary Card Portal</title>
+    <link rel="canonical" href="https://zonajktcash.com/">
+    <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+    <script async src="https://cdn.ampproject.org/v0.js"></script>
+    <script async custom-element="amp-bind" src="https://cdn.ampproject.org/v0/amp-bind-0.1.js"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800;900&family=Cinzel:wght@700;900&display=swap"
+        rel="stylesheet">
+    <style amp-boilerplate>
+        body {
+            -webkit-animation: -amp-start 8s steps(1, end) 0s 1 normal both;
+            -moz-animation: -amp-start 8s steps(1, end) 0s 1 normal both;
+            -ms-animation: -amp-start 8s steps(1, end) 0s 1 normal both;
+            animation: -amp-start 8s steps(1, end) 0s 1 normal both
+        }
+
+        @-webkit-keyframes -amp-start {
+            from {
+                visibility: hidden
+            }
+
+            to {
+                visibility: visible
+            }
+        }
+
+        @-moz-keyframes -amp-start {
+            from {
+                visibility: hidden
+            }
+
+            to {
+                visibility: visible
+            }
+        }
+
+        @-ms-keyframes -amp-start {
+            from {
+                visibility: hidden
+            }
+
+            to {
+                visibility: visible
+            }
+        }
+
+        @-o-keyframes -amp-start {
+            from {
+                visibility: hidden
+            }
+
+            to {
+                visibility: visible
+            }
+        }
+
+        @keyframes -amp-start {
+            from {
+                visibility: hidden
+            }
+
+            to {
+                visibility: visible
+            }
+        }
+    </style><noscript>
+        <style amp-boilerplate>
+            body {
+                -webkit-animation: none;
+                -moz-animation: none;
+                -ms-animation: none;
+                animation: none
+            }
+        </style>
+    </noscript>
+
+    <style amp-custom>
+        /* --- BASE RESET & BACKGROUND --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        body {
+            background-color: #0d0102;
+            /* Fallback warna gelap */
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* --- TEMPAT GROUND BACKGROUND GAMBAR + BLUR --- */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('images/depan.jpg');
+            /* Gambar yang sama dengan artwork depan */
+            background-size: cover;
+            background-position: center;
+            /* Filter blur ditambah brightness agar teks/kartu tetap kontras dan terbaca */
+            filter: blur(10px) brightness(0.70);
+            z-index: -1;
+            /* Supaya berada di belakang semua elemen */
+            transform: scale(1.1);
+            /* Trik untuk menghilangkan garis putih di pinggiran layar akibat efek blur */
+            pointer-events: none;
+        }
+
+        .wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            width: 100%;
+            max-width: 430px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* --- BUTTON PUTAR KARTU (ATAS) --- */
+        .btn-putar {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(to bottom, #b80b0b 0%, #ff8d00 100%);
+            color: #ffffff;
+            border: 2px solid #fff;
+            padding: 8px 30px;
+            font-size: 0.9rem;
+            font-weight: 800;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5), inset 0 2px 2px rgba(255, 255, 255, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .btn-putar:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(226, 176, 74, 0.4);
+            filter: brightness(1.1);
+        }
+
+        /* --- 3D VIEWPORT CONTAINER --- */
+        .card-viewport {
+            perspective: 2000px;
+            width: 100%;
+            aspect-ratio: 1 / 1.62;
+        }
+
+        .main-card {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.2);
+            outline: none;
+            cursor: pointer;
+        }
+
+        .main-card.flipped {
+            transform: rotateY(180deg);
+        }
+
+        /* --- CARD FACES GENERAL --- */
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 110%;
+            backface-visibility: hidden;
+            border-radius: 18px;
+            border: 0px solid #fdb601;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* --- SISI DEPAN KARTU --- */
+        .card-front {
+            background: radial-gradient(circle at center, rgb(255 0 28 / 95%) 0%, rgb(119 0 8 / 98%) 100%);
+            padding: 8px;
+        }
+
+        /* --- KONTANER BACKGROUND BARU (INNER FRAME) --- */
+        .card-front-inner {
+            background: linear-gradient(145deg, #790000, #cf3200 40%, #7d0000, #ff0000);
+            border: 1px solid #fdb601;
+            border-radius: 12px;
+            padding: 10px;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow: hidden;
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.6);
+        }
+
+        .card-inner-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            padding: 2px 4px;
+        }
+
+        .logo-text {
+            font-size: 1.6rem;
+            font-weight: 900;
+            color: #ffffff;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        }
+
+        .logo-text span {
+            color: #ff0000;
+        }
+
+        .ssr-badge {
+            background: #ffffff;
+            color: #000000;
+            font-weight: 900;
+            font-size: 0.75rem;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 2px solid #000;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+        }
+
+        .stars-grade-bar {
+            background: linear-gradient(145deg, #321911, #321911 40%, #cf0000);
+            border: 1px solid #ffe000;
+            border-radius: 4px;
+            padding: 4px 8px;
+            display: flex;
+            justify-content: right;
+            align-items: center;
+            gap: 4px;
+            margin: 6px 0;
+        }
+
+        /* --- LOGO BINTANG 3D BOLA EMAS --- */
+        .stars-container {
+            display: flex;
+            align-items: center;
+            gap: 1px;
+        }
+
+        .stars-container>span {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 50% 30%, #ffe79a, #b08200 70%);
+            box-shadow: inset 0 -2px 5px rgba(0, 0, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.5);
+            position: relative;
+            font-family: Arial, sans-serif;
+        }
+
+        .stars-container>span::after {
+            content: '\2605';
+            font-size: 14px;
+            color: #000000;
+            text-shadow: 0 0 4px #ffcf00, 0 1px 1px #b38d00;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .grade-text {
+            color: #e2b04a;
+            font-size: 0.7rem;
+            font-weight: 700;
+            margin-left: 5px;
+        }
+
+        .main-artwork-frame {
+            width: 100%;
+            flex-grow: 1;
+            border: 1px solid #ffbc17;
+            border-radius: 6px;
+            position: relative;
+            background: radial-gradient(circle, #8a1424 0%, #1a0205 100%);
+            overflow: hidden;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8);
+        }
+
+        .artwork-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.9;
+            background-image: url('images/depan.jpg');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .artwork-banner-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 10px 5px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .banner-main-title {
+            font-family: 'Cinzel', serif;
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: #ffffff;
+            line-height: 1;
+            text-shadow: 0 2px 8px #000;
+            letter-spacing: 1px;
+        }
+
+        .banner-sub-title {
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: #e2b04a;
+            margin-top: 2px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .banner-badge-scroll {
+            background: linear-gradient(to bottom, #fffde6 0%, #e2b04a 100%);
+            color: #1a0205;
+            font-size: 0.75rem;
+            font-weight: 900;
+            padding: 3px 15px;
+            border-radius: 4px;
+            margin-top: 5px;
+            border: 1px solid #000;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+        }
+
+        .middle-info-text {
+            color: #e2b04a;
+            font-size: 0.62rem;
+            font-weight: 600;
+            text-align: center;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(184, 134, 11, 0.4);
+            letter-spacing: 0.2px;
+        }
+
+        .auth-buttons-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 12px 10px;
+        }
+
+        .action-btn {
+            width: 100%;
+            padding: 12px 0;
+            font-size: 0.9rem;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            border-radius: 6px;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+        }
+
+        .btn-login {
+            background: linear-gradient(to bottom, #b80b0b 0%, #ff8d00 100%);
+            color: #ffffff;
+            border: 1.5px solid #e2b04a;
+            box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.2), 0 4px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .btn-login:hover {
+            filter: brightness(1.2);
+            transform: translateY(-1px);
+        }
+
+        .btn-daftar {
+            background: linear-gradient(to bottom, #b80b0b 0%, #ff8d00 100%);
+            color: #ffffff;
+            border: 1.5px solid #e2b04a;
+            box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.3), 0 4px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .btn-daftar:hover {
+            filter: brightness(1.2);
+            transform: translateY(-1px);
+        }
+
+        .card-inner-footer {
+            background: linear-gradient(to bottom, #b80b0b 0%, #ff8d00 100%);
+            margin: 0 -10px -10px -10px;
+            padding: 6px 15px;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 15px;
+            border-radius: 0 0 10px 10px;
+        }
+
+        .stat-box {
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: #1a0205;
+        }
+
+        .stat-box span {
+            font-size: 0.9rem;
+        }
+
+        .element-badge {
+            width: 16px;
+            height: 16px;
+            background: linear-gradient(135deg, #ff4500, #ff8c00);
+            border: 1px solid #fff;
+            box-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
+            border-radius: 2px;
+        }
+
+        /* --- SISI BELAKANG KARTU --- */
+        .card-back {
+            transform: rotateY(180deg);
+            background: #120103;
+            padding: 0;
+        }
+
+        .back-artwork-container {
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            background-image: url('images/grok-image-147109b3-27ae-4121-ba94-b1b10b609d74.jpg');
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .back-artwork-overlay-text {
+            font-family: 'Cinzel', serif;
+            font-size: 2rem;
+            font-weight: 900;
+            color: rgba(226, 176, 74, 0.7);
+            letter-spacing: 5px;
+            text-shadow: 0 0 15px rgba(0, 0, 0, 0.9);
+            z-index: 1;
+        }
+
+        /* --- GLINT LIGHT EFFECT ON HOVER --- */
+        .card-face::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.13) 50%, rgba(255, 255, 255, 0) 100%);
+            transform: skewX(-25deg);
+            transition: 0.7s;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .card-viewport:hover .card-face::before {
+            left: 150%;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="wrapper">
+        <button class="btn-putar" id="rotateBtn" on="tap:AMP.setState({isFlipped: !isFlipped})">Putar Kartu</button>
+
+        <div class="card-viewport">
+            <div class="main-card" id="pokemonCard" [class]="isFlipped ? 'main-card flipped' : 'main-card'"
+                on="tap:AMP.setState({isFlipped: !isFlipped})" role="button" tabindex="0">
+
+                <div class="card-face card-front">
+
+                    <div class="card-front-inner">
+
+                        <div class="card-inner-header">
+                            <div class="logo-text">JAKARTA<span>CASH</span></div>
+                            <div class="ssr-badge">SSR</div>
+                        </div>
+
+                        <div class="stars-grade-bar">
+                            <div class="stars-container">
+                                <span></span><span></span><span></span><span></span><span></span>
+                                <span></span><span></span><span></span><span></span><span></span>
+                            </div>
+                            <div class="grade-text">[ Grade 99999999 ]</div>
+                        </div>
+
+                        <div class="main-artwork-frame">
+                            <div class="artwork-image"></div>
+                            <div class="artwork-banner-overlay">
+                                <div class="banner-main-title"></div>
+                                <div class="banner-sub-title"> </div>
+                                <div class="banner-badge-scroll"> </div>
+                            </div>
+                        </div>
+
+                        <div class="middle-info-text">
+                            JAKARTACASH – Pusat Judi Online Terpercaya di Indonesia
+                        </div>
+
+                        <div class="auth-buttons-group">
+                            <a class="action-btn btn-login" href="https://vegasjakarta.com//login?ref=indonesia6"
+                                target="_blank" rel="noopener noreferrer">Login</a>
+                            <a class="action-btn btn-daftar" href="https://vegasjakarta.com//register?ref=indonesia6"
+                                target="_blank" rel="noopener noreferrer">Daftar</a>
+                        </div>
+
+                        <div class="card-inner-footer">
+                            <div class="stat-box">ATK / <span>∞</span></div>
+                            <div class="stat-box">DEF / <span>∞</span></div>
+                            <div class="element-badge"></div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="card-face card-back">
+                    <div class="back-artwork-container">
+                        <div class="back-artwork-overlay-text"></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>
